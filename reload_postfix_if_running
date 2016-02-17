@@ -1,0 +1,15 @@
+#!/bin/bash
+function main(){
+  postfix status >/dev/null
+  if [ $? -gt 0 ]; then
+    sleep 1
+    supervisorctl restart postfix
+  else
+    postfix reload
+  fi
+}
+(
+  flock -n 9 || exit 1
+  main
+) 9>/run/$(basename $0).lock
+exit 0

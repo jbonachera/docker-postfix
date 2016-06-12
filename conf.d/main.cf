@@ -1,0 +1,97 @@
+compatibility_level = 2
+queue_directory = /var/spool/postfix
+command_directory = /usr/sbin
+daemon_directory = /usr/libexec/postfix
+data_directory = /var/lib/postfix
+sendmail_path = /usr/sbin/sendmail.postfix
+newaliases_path = /usr/bin/newaliases.postfix
+mailq_path = /usr/bin/mailq.postfix
+setgid_group = postdrop
+html_directory = no
+mail_owner = postfix
+inet_interfaces = all
+inet_protocols = all
+mydestination =localhost.$mydomain, localhost
+append_dot_mydomain = no
+unknown_local_recipient_reject_code = 550
+alias_maps = hash:/etc/aliases
+alias_database = hash:/etc/aliases
+mynetworks = 127.0.0.1 [::1]
+smtp_host_lookup = native,dns
+lmtp_host_lookup = native,dns
+# Avoid dislosing information
+  # We announce a fake mta to disturb bots
+smtpd_banner = ESMTP BuluMail-4.2
+show_user_unknown_table_name = no 
+  # Disable ETRN command, which is not secure.
+smtpd_etrn_restrictions = permit_mynetworks, reject
+  # Disable VFFY command, we are not a directory.
+disable_vrfy_command = yes
+
+# SSL configuration
+
+smtpd_tls_key_file=/etc/postfix/tls/@@SMTPD_TLS_DOMAIN@@/privkey.pem
+smtpd_tls_cert_file=/etc/postfix/tls/@@SMTPD_TLS_DOMAIN@@/fullchain.pem
+smtpd_tls_session_cache_database = btree:${data_directory}/smtpd_scache
+smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
+  # We enable SSL, but do not require it
+smtpd_tls_security_level = may
+#  # SSLv3 and TLS1.0 are broken, so we do not use them
+#smtpd_tls_protocols = TLSv1.1,TLSv1.2
+smtpd_tls_protocols = TLSv1.1,TLSv1.2,SSLv3
+#  # Disable broken ciphers
+#smtpd_tls_exclude_ciphers = aNULL,MD5, DES, SHA1
+smtpd_tls_exclude_ciphers = aNULL,MD5, DES
+  # 15s should be enougth to start a TLS transaction
+smtpd_starttls_timeout = 15s
+
+smtpd_helo_required = yes
+smtpd_delay_reject = yes
+  # All the restrictions are done after the RCPT TO command
+smtpd_recipient_restrictions =
+        permit_mynetworks,
+        reject_unauth_pipelining,
+        reject_unauth_destination,
+        reject_non_fqdn_recipient,
+        reject_non_fqdn_helo_hostname,
+        reject_invalid_helo_hostname,               
+        reject_unverified_recipient,
+        permit
+
+address_verify_map = btree:$data_directory/verify_cache
+unverified_recipient_reject_reason = Recipient address lookup failed
+
+# SMTP and rates limitations
+  # Maximum message size (20Mo) 
+message_size_limit = 20000000
+  # We require to have 200Mo free size in the queue 
+queue_minfree = 200000000
+  # A single mail can have 10 recipients max
+smtpd_recipient_limit = 20
+  # We allow 100 concurrent SMTP connexions
+smtpd_client_connection_count_limit  = 100
+  # The sender have 10s to enter a command
+smtpd_timeout = 10s
+
+  # All the anvil commands works with a time unit of 10s
+anvil_rate_time_unit = 10s
+  # A client can send 5 messages per time unit max
+smtpd_client_message_rate_limit = 5
+  # A client can make 10 connections per time unit max
+smtpd_client_connection_rate_limit = 10
+  # A client can adress 60 recipients per time unit max
+smtpd_client_recipient_rate_limit = 60
+  # A client can negociate 10 SSL transaction per time unit max
+smtpd_client_new_tls_session_rate_limit = 10
+smtpd_client_event_limit_exceptions = $mynetworks
+
+transport_maps =  hash:/etc/postfix/transport
+relay_domains = @@SMTPD_DOMAINS@@
+
+postscreen_upstream_proxy_protocol = haproxy
+
+milter_protocol = 6
+milter_mail_macros = i {mail_addr} {client_addr} {client_name} {auth_authen}
+smtpd_milters = inet:@@RMILTER_HOST@@:11332
+non_smtpd_milters = inet:@@RMILTER_HOST@@:11332
+

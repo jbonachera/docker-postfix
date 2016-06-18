@@ -2,7 +2,7 @@ FROM fedora:latest
 MAINTAINER Julien BONACHERA <julien@bonachera.fr>
 EXPOSE 25 465 587
 ENTRYPOINT /sbin/entrypoint.sh
-RUN dnf install -y cyrus-sasl cyrus-sasl-plain postfix postfix-mysql && \
+RUN dnf install -y cyrus-sasl cyrus-sasl-plain postfix && \
     dnf clean all
 VOLUME ["/var/spool/postfix", "/var/lib/postfix"]
 COPY smtp-sasl.conf /etc/sasl2/smtpd.conf

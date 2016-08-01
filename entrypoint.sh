@@ -18,5 +18,9 @@ if [ -n "$SMTPD_TLS_DOMAIN" ]; then
     done
   done
 fi
+touch /etc/aliases
+newaliases
+/usr/sbin/postfix set-permissions
+/usr/sbin/postfix check
 /usr/local/bin/fake_syslog.py &
 exec /usr/sbin/fork_proxy.sh /var/spool/postfix/pid/master.pid /usr/sbin/postfix start

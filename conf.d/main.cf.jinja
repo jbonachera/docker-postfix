@@ -1,14 +1,4 @@
 compatibility_level = 2
-queue_directory = /var/spool/postfix
-command_directory = /usr/sbin
-daemon_directory = /usr/libexec/postfix
-data_directory = /var/lib/postfix
-sendmail_path = /usr/sbin/sendmail.postfix
-newaliases_path = /usr/bin/newaliases.postfix
-mailq_path = /usr/bin/mailq.postfix
-setgid_group = postdrop
-html_directory = no
-mail_owner = postfix
 inet_interfaces = all
 inet_protocols = all
 mydestination =localhost.$mydomain, localhost
@@ -28,10 +18,12 @@ smtpd_etrn_restrictions = permit_mynetworks, reject
   # Disable VFFY command, we are not a directory.
 disable_vrfy_command = yes
 
+
+{% if SMTPD_TLS_DOMAIN %}
 # SSL configuration
 
-smtpd_tls_key_file=/etc/postfix/tls/@@SMTPD_TLS_DOMAIN@@/privkey.pem
-smtpd_tls_cert_file=/etc/postfix/tls/@@SMTPD_TLS_DOMAIN@@/fullchain.pem
+smtpd_tls_key_file=/etc/postfix/tls/{{ SMTPD_TLS_DOMAIN }}/privkey.pem
+smtpd_tls_cert_file=/etc/postfix/tls/{{ SMTPD_TLS_DOMAIN }}/fullchain.pem
 smtpd_tls_session_cache_database = btree:${data_directory}/smtpd_scache
 smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
 smtp_tls_security_level = may
@@ -45,7 +37,7 @@ smtpd_tls_protocols = TLSv1.1,TLSv1.2,SSLv3
 smtpd_tls_exclude_ciphers = aNULL,MD5, DES
   # 15s should be enougth to start a TLS transaction
 smtpd_starttls_timeout = 15s
-
+{% endif %}
 smtpd_helo_required = yes
 smtpd_delay_reject = yes
   # All the restrictions are done after the RCPT TO command
@@ -87,12 +79,14 @@ smtpd_client_new_tls_session_rate_limit = 10
 smtpd_client_event_limit_exceptions = $mynetworks
 
 transport_maps =  hash:/etc/postfix/transport
-relay_domains = @@SMTPD_DOMAINS@@
+relay_domains = {{ SMTPD_DOMAINS }}
 
 postscreen_upstream_proxy_protocol = haproxy
 
 milter_protocol = 6
 milter_mail_macros = i {mail_addr} {client_addr} {client_name} {auth_authen}
-smtpd_milters = inet:@@RMILTER_HOST@@:11332
-non_smtpd_milters = inet:@@RMILTER_HOST@@:11332
+{% if RMILTER_HOST %}
+smtpd_milters = inet:{{ RMILTER_HOST }}:11332
+non_smtpd_milters = inet:{{ RMILTER_HOST }}:11332
+{% endif %}
 

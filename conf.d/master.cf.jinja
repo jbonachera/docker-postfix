@@ -135,12 +135,14 @@ submission inet n - n - - smtpd
                       -o smtpd_sasl_auth_enable=yes
                       -o smtpd_sasl_type=cyrus
                       -o smtpd_sasl_security_options=noanonymous
-                      -o smtpd_tls_key_file=/etc/postfix/tls/@@SUBMISSION_DOMAIN@@/privkey.pem
-                      -o smtpd_tls_cert_file=/etc/postfix/tls/@@SUBMISSION_DOMAIN@@/fullchain.pem
+                      {% if SUBMISSION_DOMAIN %}
+                      -o smtpd_tls_key_file=/etc/postfix/tls/{{ SUBMISSION_DOMAIN }}/privkey.pem
+                      -o smtpd_tls_cert_file=/etc/postfix/tls/{{ SUBMISSION_DOMAIN }}/fullchain.pem
                       -o smtpd_tls_security_level=encrypt
                       -o smtpd_tls_auth_only=yes
                       -o smtpd_client_connection_count_limit=10
                       -o smtpd_tls_exclude_ciphers=aNULL,MD5,DES
                       -o smtpd_tls_protocols=TLSv1.1,TLSv1.2
+                      {% endif %}
                       -o smtpd_upstream_proxy_protocol=haproxy
                       -o smtpd_upstream_proxy_timeout=5s

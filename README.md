@@ -1,1 +1,1 @@
-Postfix on fedora, with consul-template.
+Postfix on archlinux

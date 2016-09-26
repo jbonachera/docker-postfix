@@ -2,9 +2,7 @@
 trap 'exit' INT
 render.py /etc/postfix/main.cf.jinja > /etc/postfix/main.cf
 render.py /etc/postfix/master.cf.jinja > /etc/postfix/master.cf
-for DOMAIN in $(echo ${SMTPD_DOMAINS}| tr ',' ' '); do
-    echo "${DOMAIN} lmtp:${RELAY_HOST}" >> /etc/postfix/transport
-done
+render.py /etc/postfix/transport.jinja > /etc/postfix/transport
 postmap /etc/postfix/transport
 if [ -n "$SMTPD_TLS_DOMAIN" ]; then
   echo "Waiting for SSL certificates to appear.."

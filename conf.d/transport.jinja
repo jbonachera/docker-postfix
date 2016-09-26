@@ -1,0 +1,3 @@
+{% for DOMAIN in SMTPD_DOMAINS.split(',') %}
+{{ DOMAIN }} lmtp:{{ RELAY_HOST }}
+{% endfor %}

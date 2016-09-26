@@ -5,6 +5,7 @@ mydestination =localhost.$mydomain, localhost
 append_dot_mydomain = no
 unknown_local_recipient_reject_code = 550
 alias_maps = hash:/etc/aliases
+virtual_alias_maps = hash:/etc/postfix/virtual
 alias_database = hash:/etc/aliases
 mynetworks = 127.0.0.1 [::1]
 smtp_host_lookup = native,dns

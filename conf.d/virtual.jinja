@@ -1,0 +1,6 @@
+{% if SMTPD_ALIASES  %}
+{% for ALIAS in SMTPD_ALIASES.split(',') %}
+{% set orig_recipient, new_recipient =  ALIAS.split(':') %}
+{{ orig_recipient }} {{ new_recipient }}
+{% endfor %}
+{% endif %}

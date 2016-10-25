@@ -82,7 +82,6 @@ smtpd_client_event_limit_exceptions = $mynetworks
 transport_maps =  hash:/etc/postfix/transport
 relay_domains = {{ SMTPD_DOMAINS }}
 
-postscreen_upstream_proxy_protocol = haproxy
 
 milter_protocol = 6
 milter_mail_macros = i {mail_addr} {client_addr} {client_name} {auth_authen}

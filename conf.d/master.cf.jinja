@@ -144,5 +144,3 @@ submission inet n - n - - smtpd
                       -o smtpd_tls_exclude_ciphers=aNULL,MD5,DES
                       -o smtpd_tls_protocols=TLSv1.1,TLSv1.2
                       {% endif %}
-                      -o smtpd_upstream_proxy_protocol=haproxy
-                      -o smtpd_upstream_proxy_timeout=5s

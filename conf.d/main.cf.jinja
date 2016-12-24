@@ -31,9 +31,9 @@ smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
 smtp_tls_security_level = may
   # We enable SSL, but do not require it
 smtpd_tls_security_level = may
-#  # SSLv3 and TLS1.0 are broken, so we do not use them
+# Allow SSLv3 to receive mail from outdated providers ... (LaPoste, AirFrance..)
 #smtpd_tls_protocols = TLSv1.1,TLSv1.2
-smtpd_tls_protocols = TLSv1.1,TLSv1.2,SSLv3
+smtpd_tls_protocols = !SSLv2
 #  # Disable broken ciphers
 #smtpd_tls_exclude_ciphers = aNULL,MD5, DES, SHA1
 smtpd_tls_exclude_ciphers = aNULL,MD5, DES
